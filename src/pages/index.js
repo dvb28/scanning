@@ -1,9 +1,14 @@
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 export default function Home() {
+  const route = useRouter();
+
+  useEffect(() => {
+    route.push('/auth/login'); 
+  }, []);
+
   return (
-    <div className='mt-5'>Đào Việt Bảo</div>
-  )
+    <></>
+  );
 }

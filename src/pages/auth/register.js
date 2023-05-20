@@ -1,22 +1,19 @@
 import Link from 'next/link'
 import React from 'react'
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Toasts from '@/utils/toasts';
 
 export default function Register() {
   // Hàm logic đăng ký
   const registerHandle = (e) => {
     e.preventDefault()
-    const resolveAfter3Sec = new Promise((resolve, rejected) => setTimeout(rejected, 2500));
-    toast.promise(resolveAfter3Sec, {
-      pending: 'Đang đăng ký tài khoản',
-      success: 'Đăng ký thành công 👌',
+    Toasts.promise({
+      pending: 'Đang đăng nhập',
+      success: 'Đăng nhập thành công 👌',
       error: 'Đăng ký thất bại 🤯',
     });
   }
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
-      <ToastContainer autoClose={2000} />
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         {/* <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
                     <img className="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo"></img>

@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Toasts from '@/utils/toasts';
+import { useRouter } from 'next/router';
 
 export default function Login() {
+  const route = useRouter();
+  // State Email
+  const [userEmail, setUserEmail] = useState('');
+  // State Password
+  const [userPassword, setUserPassword] = useState('');
+
   // Sự kiện đăng nhập
   const loginHandle = (e) => {
     e.preventDefault();
@@ -10,7 +17,13 @@ export default function Login() {
       pending: 'Đang đăng nhập',
       success: 'Đăng nhập thành công 👌',
       error: 'Đăng nhập thất bại 🤯',
-    });
+    }, async () => {
+      if(userEmail === 'daovietbao2002@gmail.com' && userPassword === '123456') {
+        return true;
+      }
+    }, async () => {
+      route.push('/components/scan');
+    }, 2000);
   };
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
@@ -36,6 +49,7 @@ export default function Login() {
                   type="email"
                   name="email"
                   id="email"
+                  onChange={e => setUserEmail(e.target.value)}
                   className="outline-none bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="youremail@gmail.com"
                   required=""
@@ -52,6 +66,7 @@ export default function Login() {
                   type="password"
                   name="password"
                   id="password"
+                  onChange={e => setUserPassword(e.target.value)}
                   placeholder="••••••••"
                   className="outline-none bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required=""

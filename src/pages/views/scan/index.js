@@ -15,9 +15,9 @@ export default function Scan() {
   const scanHandle = (e) => {
     e.preventDefault();
     Toasts.promise({
-      pending: 'Đang đăng ký tài khoản',
-      success: 'Đăng ký thành công 👌',
-      error: 'Đăng ký thất bại 🤯',
+      pending: 'Đang quét tài liệu',
+      success: 'Quét thành công 👌',
+      error: 'Quét thất bại 🤯',
     });
   };
   return (

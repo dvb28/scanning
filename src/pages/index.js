@@ -7,11 +7,11 @@ export default function Home() {
 
   useEffect(() => {
     const userData = JSON.parse(window.localStorage.getItem('user-data-obj'));
-    // if(userData) {
-    //   route.push('/views/scan');
-    // } else {
-    // }
-    route.push('/auth/login');
+    if(userData) {
+      route.push('/views/scan');
+    } else {
+      route.push('/auth/login');
+    }
   }, [route]);
 
   return (

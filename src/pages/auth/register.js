@@ -7,8 +7,8 @@ export default function Register() {
   const registerHandle = (e) => {
     e.preventDefault()
     Toasts.promise({
-      pending: 'Đang đăng nhập',
-      success: 'Đăng nhập thành công 👌',
+      pending: 'Đang đăng ký',
+      success: 'Đăng ký thành công 👌',
       error: 'Đăng ký thất bại 🤯',
     });
   }

@@ -7,8 +7,8 @@ const Toasts = {
      },
      promise: (promiseState, handleCallback = false, callback = false, delayTime = 2000) => {
           const resolveAfter3Sec = new Promise((resolve, rejected) => setTimeout(() => {
-               if(callback) {
-                    callback().then(res => {
+               if(validateCallback) {
+                    validateCallback().then(res => {
                          if(res === true) {
                               if(handleCallback !== false) {
                                    handleCallback();

@@ -5,12 +5,15 @@ const Toasts = {
      default: (log) => {
           toast(log);
      },
-     promise: (promiseState, callback = false, delayTime = 2000) => {
+     promise: (promiseState, handleCallback = false, callback = false, delayTime = 2000) => {
           const resolveAfter3Sec = new Promise((resolve, rejected) => setTimeout(() => {
                if(callback) {
                     callback().then(res => {
                          if(res === true) {
-                              resolve();
+                              if(handleCallback !== false) {
+                                   handleCallback();
+                                   resolve();
+                              }
                          } else {
                               rejected();   
                          }

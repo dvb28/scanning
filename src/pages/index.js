@@ -5,7 +5,12 @@ export default function Home() {
   const route = useRouter();
 
   useEffect(() => {
-    route.push('/auth/login');
+    const userData = JSON.parse(window.localStorage.getItem('user-data-obj'));
+    if(userData) {
+      route.push('/views/scan');
+    } else {
+      route.push('/auth/login');
+    }
   }, [route]);
 
   return (

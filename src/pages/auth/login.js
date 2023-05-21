@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Toasts from '@/utils/toasts';
+import { useRouter } from 'next/router';
 
 export default function Login() {
+
+  const route = useRouter();
+
+  const [emailInp, setEmailInp] = useState('');
+
+  const [passwordInp, setPasswordInp] = useState('');
   // Sự kiện đăng nhập
   const loginHandle = (e) => {
     e.preventDefault();
@@ -10,11 +17,21 @@ export default function Login() {
       pending: 'Đang đăng nhập',
       success: 'Đăng nhập thành công 👌',
       error: 'Đăng nhập thất bại 🤯',
+    }, async () => {
+      window.localStorage.setItem('user-data-obj', JSON.stringify({
+        userEmail: "daovietbao2002@gmail.com",
+        userPassword: '123456'
+      }));
+      setTimeout(() => {
+        route.push('/views/scan');
+      }, 2000);
+    }, async () => {
+      return emailInp === 'daovietbao2002@gmail.com' && passwordInp === '123456';
     });
   };
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+      <div className="h-[100vh] flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         {/* <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
              <img className="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo"></img>
              Flowbite   
@@ -36,6 +53,7 @@ export default function Login() {
                   type="email"
                   name="email"
                   id="email"
+                  onChange={e => setEmailInp(e.target.value)}
                   className="outline-none bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="youremail@gmail.com"
                   required=""
@@ -52,6 +70,7 @@ export default function Login() {
                   type="password"
                   name="password"
                   id="password"
+                  onChange={e => setPasswordInp(e.target.value)}
                   placeholder="••••••••"
                   className="outline-none bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required=""

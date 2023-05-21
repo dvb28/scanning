@@ -5,7 +5,7 @@ const Toasts = {
      default: (log) => {
           toast(log);
      },
-     promise: (promiseState, handleCallback = false, callback = false, delayTime = 2000) => {
+     promise: (promiseState, handleCallback = false, validateCallback = false, delayTime = 2000) => {
           const resolveAfter3Sec = new Promise((resolve, rejected) => setTimeout(() => {
                if(validateCallback) {
                     validateCallback().then(res => {

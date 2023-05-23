@@ -1,128 +1,129 @@
-import React, { useState } from 'react';
+'use client';
+import * as React from 'react';
+import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
+import Button from '@mui/material/Button';
 import Main from '@/pages/layout/main';
-import { Button, Table } from 'flowbite-react';
-import Toasts from '@/utils/toasts';
+
+const columns = [
+  { id: 'name', label: 'Tên người dùng', minWidth: 170 },
+  { id: 'date', label: 'Ngày làm việc', minWidth: 100 },
+  {
+    id: 'timeWorkDay',
+    label: 'Số giờ làm việc',
+    minWidth: 170,
+    align: 'right',
+    format: (value) => value.toLocaleString('en-US'),
+  },
+  {
+    id: 'fileScanned',
+    label: 'Số file đã làm',
+    minWidth: 170,
+    align: 'right',
+    format: (value) => value.toLocaleString('en-US'),
+  },
+  {
+    id: 'earnMoney',
+    label: 'Số tiền công',
+    minWidth: 170,
+    align: 'right',
+    format: (value) => value.toFixed(2),
+  },
+];
+
+function createData(name, date, timeWorkDay, fileScanned, earnMoney) {
+  return { name, date, timeWorkDay, fileScanned, earnMoney };
+}
+
+const rows = [
+  createData('India', 'IN', 1324171354, 3287263, 2),
+  createData('China', 'CN', 1403500365, 9596961, 2),
+  createData('Italy', 'IT', 60483973, 301340, 2),
+  createData('United States', 'US', 327167434, 9833520, 2),
+  createData('Canada', 'CA', 37602103, 9984670, 2),
+  createData('Australia', 'AU', 25475400, 7692024, 2),
+  createData('Germany', 'DE', 83019200, 357578, 2),
+  createData('Ireland', 'IE', 4857000, 70273, 2),
+  createData('Mexico', 'MX', 126577691, 1972550, 2),
+  createData('Japan', 'JP', 126317000, 377973, 2),
+  createData('France', 'FR', 67022000, 640679, 2),
+  createData('United Kingdom', 'GB', 67545757, 242495, 2),
+  createData('Russia', 'RU', 146793744, 17098246, 2),
+  createData('Nigeria', 'NG', 200962417, 923768, 2),
+  createData('Brazil', 'BR', 210147125, 8515767, 2),
+];
 
 export default function Report() {
-  const [reportData, setReportData] = useState([
-    {
-      userName: 'Đào Việt Bảo',
-      date:"20/05/2020",
-      dayWorkTime: ''
-    }
-  ]);
-  // Xuất báo cáo
-  const reportHandle = (e) => {
-    e.preventDefault();
-    Toasts.promise({
-      pending: 'Đang xuất báo cáo',
-      success: 'Xuất báo cáo thành công 👌',
-      error: 'Xuất báo cáo thất bại 🤯',
-    })
-  }
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
   return (
     <Main>
-      <h3 className="m-6 text-2xl uppercase mb-5 text-blue-600">Báo cáo công việc</h3>
-      <Table hoverable={true}>
-        <Table.Head>
-          <Table.HeadCell>STT</Table.HeadCell>
-          <Table.HeadCell>Tên người dùng</Table.HeadCell>
-          <Table.HeadCell>Ngày</Table.HeadCell>
-          <Table.HeadCell>Số giờ làm việc</Table.HeadCell>
-          <Table.HeadCell>Số file đã quét</Table.HeadCell>
-          <Table.HeadCell>
-            <span className="sr-only">Chi tiết</span>
-          </Table.HeadCell>
-        </Table.Head>
-        <Table.Body className="divide-y">
-          <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-          <Table.Cell>1</Table.Cell>
-            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-            Đào Việt Bảo
-            </Table.Cell>
-            <Table.Cell>Sliver</Table.Cell>
-            <Table.Cell>Laptop</Table.Cell>
-            <Table.Cell>$2999</Table.Cell>
-            <Table.Cell>
-              <a
-                href="/tables"
-                className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-              >
-                Chi tiết
-              </a>
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-          <Table.Cell>1</Table.Cell>
-            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-            Đào Việt Bảo
-            </Table.Cell>
-            <Table.Cell>White</Table.Cell>
-            <Table.Cell>Laptop PC</Table.Cell>
-            <Table.Cell>$1999</Table.Cell>
-            <Table.Cell>
-              <a
-                href="/tables"
-                className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-              >
-                Chi tiết
-              </a>
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-          <Table.Cell>1</Table.Cell>
-            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-            Đào Việt Bảo
-            </Table.Cell>
-            <Table.Cell>Black</Table.Cell>
-            <Table.Cell>Accessories</Table.Cell>
-            <Table.Cell>$99</Table.Cell>
-            <Table.Cell>
-              <a
-                href="/tables"
-                className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-              >
-                Chi tiết
-              </a>
-            </Table.Cell>
-          </Table.Row>
-        </Table.Body>
-      </Table>
-      <h3 className="mx-6 my-5 text-xl text-bold uppercase text-blue-600">Tổng kết</h3>
-      <div className='mb-6'>
-        <Table hoverable={true}>
-          <Table.Head>
-            <Table.HeadCell>ID</Table.HeadCell>
-            <Table.HeadCell>Tên người dùng</Table.HeadCell>
-            <Table.HeadCell>Số ngày làm việc trong tháng</Table.HeadCell>
-            <Table.HeadCell>Số file đã làm</Table.HeadCell>
-            <Table.HeadCell>Số file đã quét</Table.HeadCell>
-            <Table.HeadCell>
-              <span className="sr-only">Chi tiết</span>
-            </Table.HeadCell>
-          </Table.Head>
-          <Table.Body className="divide-y">
-            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-            <Table.Cell>1</Table.Cell>
-              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                Đào Việt Bảo
-              </Table.Cell>
-              <Table.Cell>Sliver</Table.Cell>
-              <Table.Cell>Laptop</Table.Cell>
-              <Table.Cell>$2999</Table.Cell>
-              <Table.Cell>
-                <a
-                  href="/tables"
-                  className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                >
-                  Chi tiết
-                </a>
-              </Table.Cell>
-            </Table.Row>
-          </Table.Body>
-        </Table>
-      </div>
-      <Button className='float-right m-4' onClick={reportHandle}>Xuất báo cáo</Button>
+      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        <TableContainer sx={{ maxHeight: 440 }}>
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableCell
+                    key={column.id}
+                    align={column.align}
+                    style={{ minWidth: column.minWidth }}
+                  >
+                    {column.label}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row) => {
+                  return (
+                    <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                      {columns.map((column) => {
+                        const value = row[column.id];
+                        return (
+                          <TableCell key={column.id} align={column.align}>
+                            {column.format && typeof value === 'number'
+                              ? column.format(value)
+                              : value}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={rows.length}
+          labelRowsPerPage="Số dòng hiển thị"
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
+      <Button variant="contained" sx={{margin: '20px 0', float: 'right'}}>Xuất báo cáo</Button>
     </Main>
   );
 }

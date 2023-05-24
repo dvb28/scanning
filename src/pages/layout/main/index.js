@@ -201,7 +201,7 @@ export default function Main({ children }) {
           {[
             {
               text: 'Người dùng',
-              link: '/views/user-profile',
+              link: '/views/userprofile',
               icon: <AccountCircleOutlinedIcon/>
             }
           ].map((item, index) => (

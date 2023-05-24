@@ -22,3 +22,7 @@ body {
   background-color: #c2c2c2;
   border-radius: 50px;
 }
+
+.MuiTreeItem-content {
+  padding: 7px;
+}

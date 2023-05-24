@@ -203,6 +203,7 @@ export default function Scan() {
                     border: '1px solid rgba(128, 128, 128, 0.4)',
                     borderRadius: '6px',
                     padding: '15px 12px',
+                    backgroundColor: handleScanType ? 'white' : 'rgba(128, 128, 128, 0.1)'
                   }}
                 >
                   <div>

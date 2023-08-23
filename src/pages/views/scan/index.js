@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { Viewer } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import Main from '@/pages/layout/main';
 import Toasts from '@/utils/toasts';
-import { Label } from 'flowbite-react';
 import {
   Button,
   FormControl,
@@ -18,6 +16,7 @@ import {
   TextField,
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import Viewers from '@/components/viewers';
 
 export default function Scan() {
   // Máy scan đã chọn
@@ -58,6 +57,17 @@ export default function Scan() {
   const handleChangeScanType = (value) => {
     setHandleScanType(value);
   };
+
+  // Try Connnect
+  const tryingConnectScanner = (e) => {
+    e.preventDefault();
+    Toasts.promise({
+      pending: 'Đang thử kết nối với máy quét',
+      success: 'Kết nối với máy quét thành công 👌',
+      error: 'Kết nối với máy quét thất bại 🤯',
+    });
+  }
+
   // Quét tài liệu
   const scanHandle = (e) => {
     e.preventDefault();
@@ -68,12 +78,12 @@ export default function Scan() {
     });
   };
   return (
-    <Main>
+    <Main title='Quét tài liệu'>
       <Grid container spacing={2}>
-        <Grid item xs={6} sx={{ height: '86.6vh', overflow: 'auto' }}>
-          <Viewer fileUrl="/pdf-test.pdf" />
+        <Grid item xs={12} md={12} lg={6} sx={{ height: '86.6vh', overflow: 'auto' }}>
+          <Viewers fileUrl="/pdf-test.pdf" />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={12} lg={6} >
           <Typography
             sx={{ textTransform: 'uppercase', color: 'royalblue', marginBottom: '10px'}}
             variant="h6"
@@ -82,8 +92,8 @@ export default function Scan() {
             Cài đặt máy quét
           </Typography>
           <Grid container spacing={3}>
-            <Grid item xs={6}>
-              <FormControl fullWidth sx={{ marginBottom: '25px' }}>
+            <Grid item xs={12} md={6} lg={6}>
+              <FormControl size="small" fullWidth sx={{ marginBottom: '25px' }}>
                 <InputLabel id="scanner-machine-label">Chọn máy quét</InputLabel>
                 <Select
                   labelId="scanner-machine-label"
@@ -95,7 +105,7 @@ export default function Scan() {
                   <MenuItem value={10}>Chọn máy quét</MenuItem>
                 </Select>
               </FormControl>
-              <FormControl fullWidth sx={{ marginBottom: '25px' }}>
+              <FormControl size="small" fullWidth sx={{ marginBottom: '25px' }}>
                 <InputLabel id="scanner-dpi-label">Độ phân giải (DPI)</InputLabel>
                 <Select
                   labelId="scanner-dpi-label"
@@ -108,8 +118,10 @@ export default function Scan() {
                 </Select>
               </FormControl>
               <Grid container spacing={2}>
-                <Grid item xs={8}>
+                <Grid item lg={8} md={8} xs={6}>
                   <TextField
+                    fullWidth
+                    size="small"
                     id="scanner-prefix-name"
                     placeholder="VD: HS.20.21.22.X"
                     label="Cấu hình tên file (Prefix)"
@@ -117,8 +129,10 @@ export default function Scan() {
                     onChange={handleChangePrefixName}
                   />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item lg={4} md={4} xs={6}>
                   <TextField
+                    fullWidth
+                    size="small"
                     sx={{ marginBottom: '25px' }}
                     type="number"
                     id="scanner-suffix-number"
@@ -128,7 +142,7 @@ export default function Scan() {
                   />
                 </Grid>
               </Grid>
-              <FormControl fullWidth sx={{ marginBottom: '25px' }}>
+              <FormControl size="small" fullWidth sx={{ marginBottom: '25px' }}>
                 <InputLabel id="scanner-color-label">Màu quét</InputLabel>
                 <Select
                   labelId="scanner-color-label"
@@ -142,7 +156,7 @@ export default function Scan() {
                   <MenuItem value="color">Màu</MenuItem>
                 </Select>
               </FormControl>
-              <FormControl fullWidth sx={{ marginBottom: '25px' }}>
+              <FormControl size="small" fullWidth sx={{ marginBottom: '25px' }}>
                 <InputLabel id="scanner-page-label">Số trang muốn quét</InputLabel>
                 <Select
                   labelId="scanner-page-label"
@@ -163,13 +177,13 @@ export default function Scan() {
                 <Button
                   variant="contained"
                   color="error"
-                  onClick={(e) => Toasts.error('Vui lòng kết nối với máy quét')}
+                  onClick={tryingConnectScanner}
                 >
-                  Vui lòng kết nối máy scan
+                  Chưa kết nối máy scan
                 </Button>
               )}
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6} lg={6}>
               <FormControl>
                 <FormLabel sx={{color: 'royalblue'}} id="radio-group-change-scan-type">Cấu hình quét</FormLabel>
                 <RadioGroup
@@ -182,14 +196,14 @@ export default function Scan() {
                     onChange={(e) => handleChangeScanType(true)}
                     id="auto-scanning"
                     value="auto-scanning"
-                    control={<Radio />}
+                    control={<Radio size="small"/>}
                     label="Quét tự động"
                   />
                   <FormControlLabel
                     onChange={(e) => handleChangeScanType(false)}
                     id="handle-scanning"
                     value="handle-scanning"
-                    control={<Radio />}
+                    control={<Radio size="small"/>}
                     label="Quét thủ công"
                   />
                 </RadioGroup>
@@ -208,6 +222,7 @@ export default function Scan() {
                 >
                   <div>
                     <TextField
+                      size="small"
                       id="after-scan-delay"
                       fullWidth
                       label="Thời gian chờ sau quét (s)"
@@ -226,13 +241,13 @@ export default function Scan() {
                           <FormControlLabel
                             id="auto-scanning"
                             value="female"
-                            control={<Radio disabled={!handleScanType} id="one-pages-scan" />}
+                            control={<Radio size="small" disabled={!handleScanType} id="one-pages-scan" />}
                             label="Quét một mặt"
                           />
                           <FormControlLabel
                             id="handle-scanning"
                             value="male"
-                            control={<Radio disabled={!handleScanType} id="one-multiple-scan" />}
+                            control={<Radio size="small" disabled={!handleScanType} id="one-multiple-scan" />}
                             label="Quét hai mặt"
                           />
                         </RadioGroup>

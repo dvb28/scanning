@@ -25,6 +25,8 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import Toasts from '@/utils/toasts';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { useRouter } from 'next/router';
+import Avatars from '@/components/avartars';
+import { Stack } from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -93,7 +95,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-export default function Main({ children }) {
+export default function Main({ title = 'Nội dung', children }) {
   const theme = useTheme();
   const route = useRouter();
   
@@ -123,25 +125,28 @@ export default function Main({ children }) {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex'}}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              marginRight: 5,
-              ...(open && { display: 'none' }),
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Nội dung
-          </Typography>
+        <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
+          <Stack direction="row" alignItems='center'>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={{
+                  marginRight: 5,
+                  ...(open && { display: 'none' }),
+                }}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography variant="h6" noWrap component="div">
+                {title}
+              </Typography>
+          </Stack>
+          <Avatars/>  
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
@@ -249,7 +254,7 @@ export default function Main({ children }) {
             </ListItem>
         </List>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: '100%', overflow: 'auto'}}>
         <DrawerHeader />
         {children}
       </Box>

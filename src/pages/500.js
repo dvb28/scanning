@@ -27,6 +27,6 @@ export default function ServerError() {
              </div>
          </div>
      </div>
- </section>
+        </section>
   )
 }

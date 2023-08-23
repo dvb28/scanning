@@ -86,12 +86,12 @@ export default function Report() {
   };
 
   return (
-    <Main>
+    <Main title='Báo cáo công việc'>
       <Typography sx={{color: 'royalblue', marginBottom: '10px'}}>
           Thống kê công việc đã làm
       </Typography>
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 440 }}>
+      <Paper sx={{ width: '100%', overflow: 'auto' }}>
+        <TableContainer sx={{ maxHeight: 440}}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -109,9 +109,9 @@ export default function Report() {
             <TableBody>
               {rows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
+                .map((row, index) => {
                   return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                    <TableRow key={`${row.label}-${index}`} hover role="checkbox" tabIndex={-1}>
                       {columns.map((column) => {
                         const value = row[column.id];
                         return (

@@ -69,11 +69,6 @@ export default function Report() {
   // Hàm chức năng xuất báo cáo
   const handleExportReport = (e) => {
     e.preventDefault();
-    Toasts.promise({
-      pending: 'Đang xuất báo cáo',
-      success: 'Xuất báo cáo thành công 👌',
-      error: 'Xuất báo cáo thất bại 🤯',
-    });
   }
 
   const handleChangePage = (event, newPage) => {

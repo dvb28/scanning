@@ -1,0 +1,11 @@
+.FileManager__help .FileManager__toolbar {
+     display: none;
+}
+
+li[data-flmngr-element-id="toolbar__unsplash"] {
+     display: none;
+}
+
+li[data-flmngr-element-id="toolbar__find"] {
+     display: none;
+}

@@ -1,8 +1,45 @@
 @import '../../node_modules/pdfjs-dist/web/pdf_viewer.css';
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+* {
+  font-family: 'Quicksand', sans-serif!important;
+  font-weight: 500!important;
+}
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+#__next {
+  height: 100%;
+}
+
 .MuiTreeItem-content {
   padding: 7px 10px;
 }
 
-.css-10k2sng-MuiCardContent-root {
+.css-10k2sng-MuiCardContent-root, .folder-manager-file {
   scrollbar-width: 0px;
+}
+
+/* Hidden scrollbar */
+.hidden-scrollbar::-webkit-scrollbar {
+  width: 0;
+  background-color: transparent;
+}
+
+.hidden-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+/* Ẩn thanh cuộn trên trình duyệt Firefox */
+.hidden-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent;
+}
+
+.folder-name em {
+  background: #fbf3cf;
+  padding: 10px 5px;
 }

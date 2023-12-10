@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import Main from '@/pages/layout/main';
 import Toasts from '@/utils/toasts';
@@ -17,10 +17,14 @@ import {
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Viewers from '@/components/viewers';
+import { LoadingButton } from '@mui/lab';
+import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 
 export default function Scan() {
   // Máy scan đã chọn
-  const [scanner, setScanner] = useState('');
+  const [scanner, setScanner] = React.useState('');
+
+  const [scConnectLoad, setScConnectLoad] = React.useState(false);
 
   // Hàm khi thay đổi máy scan
   const handleChangeScanner = (event) => {
@@ -28,7 +32,7 @@ export default function Scan() {
   };
 
   // Thay đổi độ phân giải của bản quét
-  const [DPI, setDPI] = useState(300);
+  const [DPI, setDPI] = React.useState(300);
 
   // Hàm khi thay đổi máy scan
   const handleChangeDPI = (event) => {
@@ -36,7 +40,7 @@ export default function Scan() {
   };
 
   // Thay đổi cầu hình prefix tên file
-  const [prefixName, setPrefixName] = useState('');
+  const [prefixName, setPrefixName] = React.useState('');
 
   // Hàm khi thay đổi máy scan
   const handleChangePrefixName = (event) => {
@@ -44,12 +48,12 @@ export default function Scan() {
   };
 
   // Hàm khi thay đổi kiểu scan
-  const [handleScanType, setHandleScanType] = useState(false);
+  const [handleScanType, setHandleScanType] = React.useState(false);
 
   // Kiểm tra kết nối của máy scan
-  const [scannerCnt, setScannerCnt] = useState(false);
+  const [scannerCnt, setScannerCnt] = React.useState(false);
 
-  // Thay đổi trạng thái kết nối của máy quét
+  // Thay đổi trạng thái kết nối của  máy quét
   const changeScannerCnt = (value) => {
     setScannerCnt(value);
   };
@@ -58,34 +62,53 @@ export default function Scan() {
     setHandleScanType(value);
   };
 
+  // First Try Connected
+  const firstTryConnected = () => {
+    setScConnectLoad(false);
+    changeScannerCnt(true);
+  };
+
   // Try Connnect
   const tryingConnectScanner = (e) => {
     e.preventDefault();
-    Toasts.promise({
-      pending: 'Đang thử kết nối với máy quét',
-      success: 'Kết nối với máy quét thành công 👌',
-      error: 'Kết nối với máy quét thất bại 🤯',
-    });
-  }
+
+    if (scannerCnt === false) {
+      setScConnectLoad(true);
+      Toasts.promise({
+        promiseState: {
+          pending: 'Đang thử kết nối với máy quét',
+          success: 'Kết nối với máy quét thành công 👌',
+          error: 'Kết nối với máy quét thất bại 🤯',
+        },
+        handle: () => {
+          setScConnectLoad(false);
+          changeScannerCnt(true);
+        },
+      });
+    }
+  };
 
   // Quét tài liệu
   const scanHandle = (e) => {
     e.preventDefault();
-    Toasts.promise({
-      pending: 'Đang quét tài liệu',
-      success: 'Quét tài liệu thành công 👌',
-      error: 'Quét tài liệu thất bại 🤯',
-    });
   };
+
+  React.useEffect(() => {
+    setScConnectLoad(true);
+    setTimeout(() => {
+      firstTryConnected();
+    }, 2000);
+  }, []);
+
   return (
-    <Main title='Quét tài liệu'>
+    <Main title="Quét tài liệu">
       <Grid container spacing={2}>
         <Grid item xs={12} md={12} lg={6} sx={{ height: '86.6vh', overflow: 'auto' }}>
           <Viewers fileUrl="/pdf-test.pdf" />
         </Grid>
-        <Grid item xs={12} md={12} lg={6} >
+        <Grid item xs={12} md={12} lg={6}>
           <Typography
-            sx={{ textTransform: 'uppercase', color: 'royalblue', marginBottom: '10px'}}
+            sx={{ textTransform: 'uppercase', color: 'royalblue', marginBottom: '10px' }}
             variant="h6"
             component="h6"
           >
@@ -170,22 +193,30 @@ export default function Scan() {
                 </Select>
               </FormControl>
               {scannerCnt ? (
-                <Button variant="contained" onClick={scanHandle}>
+                <Button variant="contained" onClick={scanHandle} sx={{ mb: 1.5 }}>
                   Quét tài liệu
                 </Button>
               ) : (
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={tryingConnectScanner}
-                >
-                  Chưa kết nối máy scan
-                </Button>
+                ''
               )}
+              <LoadingButton
+                size="md"
+                color={scannerCnt ? 'success' : 'error'}
+                onClick={tryingConnectScanner}
+                loading={scConnectLoad}
+                loadingPosition="start"
+                startIcon={<DocumentScannerIcon />}
+                variant="contained"
+                sx={{ display: 'flex', alignItems: 'center' }}
+              >
+                <span>{scannerCnt ? 'Đã kết nối máy scan' : 'Chưa kết nối máy scan'}</span>
+              </LoadingButton>
             </Grid>
             <Grid item xs={12} md={6} lg={6}>
               <FormControl>
-                <FormLabel sx={{color: 'royalblue'}} id="radio-group-change-scan-type">Cấu hình quét</FormLabel>
+                <FormLabel sx={{ color: 'royalblue' }} id="radio-group-change-scan-type">
+                  Cấu hình quét
+                </FormLabel>
                 <RadioGroup
                   row
                   defaultValue="handle-scanning"
@@ -196,28 +227,26 @@ export default function Scan() {
                     onChange={(e) => handleChangeScanType(true)}
                     id="auto-scanning"
                     value="auto-scanning"
-                    control={<Radio size="small"/>}
+                    control={<Radio size="small" />}
                     label="Quét tự động"
                   />
                   <FormControlLabel
                     onChange={(e) => handleChangeScanType(false)}
                     id="handle-scanning"
                     value="handle-scanning"
-                    control={<Radio size="small"/>}
+                    control={<Radio size="small" />}
                     label="Quét thủ công"
                   />
                 </RadioGroup>
               </FormControl>
               <div>
-                <div style={{ color: 'royalblue', margin: '10px 0' }}>
-                  Cấu hình quét tự động
-                </div>
+                <div style={{ color: 'royalblue', margin: '10px 0' }}>Cấu hình quét tự động</div>
                 <div
                   style={{
                     border: '1px solid rgba(128, 128, 128, 0.4)',
                     borderRadius: '6px',
                     padding: '15px 12px',
-                    backgroundColor: handleScanType ? 'white' : 'rgba(128, 128, 128, 0.1)'
+                    backgroundColor: handleScanType ? 'white' : 'rgba(128, 128, 128, 0.1)',
                   }}
                 >
                   <div>
@@ -241,13 +270,21 @@ export default function Scan() {
                           <FormControlLabel
                             id="auto-scanning"
                             value="female"
-                            control={<Radio size="small" disabled={!handleScanType} id="one-pages-scan" />}
+                            control={
+                              <Radio size="small" disabled={!handleScanType} id="one-pages-scan" />
+                            }
                             label="Quét một mặt"
                           />
                           <FormControlLabel
                             id="handle-scanning"
                             value="male"
-                            control={<Radio size="small" disabled={!handleScanType} id="one-multiple-scan" />}
+                            control={
+                              <Radio
+                                size="small"
+                                disabled={!handleScanType}
+                                id="one-multiple-scan"
+                              />
+                            }
                             label="Quét hai mặt"
                           />
                         </RadioGroup>

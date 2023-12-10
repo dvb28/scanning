@@ -1,0 +1,101 @@
+.page_404 {
+  padding: 40px 0;
+  background: #fff;
+  font-family: 'Quicksand', serif;
+}
+
+.page_404 img {
+  width: 100%;
+}
+
+.four_zero_four_bg {
+  background-image: url(https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif);
+  height: 400px;
+  background-position: center;
+}
+
+.four_zero_four_bg h2 {
+  font-weight: 400 !important;
+  font-size: 80px;
+  color: #333;
+  margin: 0;
+}
+
+.page_404 .text-center {
+  text-align: center;
+}
+
+.page_404 .container {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.page_404 .contant_box_404 h2 {
+  font-weight: 400 !important;
+  font-size: 30px;
+  color: #333;
+  margin: 0;
+  margin: 10px 0 15px 0;
+}
+
+.page_404 .contant_box_404 p {
+  font-weight: 400 !important;
+  font-size: 14px;
+  margin: 10px;
+  color: #333;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .page_404 .col-sm-12 {
+    width: 100%;
+  }
+
+  .col-sm-10 {
+    width: 83.33333333%;
+  }
+
+  .page_404 .col-sm-offset-1 {
+    margin-left: 8.33333333%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page_404 .container {
+    width: 1170px;
+  }
+}
+
+@media (min-width: 992px) {
+  .page_404 .container {
+    width: 970px;
+  }
+}
+
+@media (min-width: 768px) {
+  .page_404 .container {
+    width: 750px;
+  }
+}
+
+.four_zero_four_bg h1 {
+  font-size: 80px;
+}
+
+.four_zero_four_bg h3 {
+  font-size: 80px;
+}
+
+.link_404 {
+  color: #fff !important;
+  padding: 10px 20px;
+  background: #48abf7;
+  margin: 20px 0;
+  display: inline-block;
+}
+
+.contant_box_404 {
+  margin-top: -50px;
+}

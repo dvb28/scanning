@@ -1,7 +1,4 @@
-
-
-'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Toasts from '@/utils/toasts';
@@ -17,43 +14,139 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { fetcherPost } from '@/utils/fetcher';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { IconButton, InputAdornment } from '@mui/material';
+import { validateEmail, validatePassword } from '@/utils/validate';
+import { getCookie, setCookie } from '@/utils/cookie';
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
+// Default Theme
 const defaultTheme = createTheme();
 
 export default function Login() {
+  // useRoute
   const route = useRouter();
+  
+  // Change Route
+  const changeRoute = (path) => route.push(path);
 
-  const [emailInp, setEmailInp] = useState('');
 
-  const [passwordInp, setPasswordInp] = useState('');
+  // Email Input
+  const [emailInp, setEmailInp] = useState('admin@gmail.com');
+
+  // Password Input
+  const [passwordInp, setPasswordInp] = useState('Dvb_2002');
+
+  // Show Password
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Email Error Helper
+  const [emailError, setEmailError] = useState('');
+
+  // Password Error Helper
+  const [passwordError, setPasswordError] = useState('');
+
+  // Handle Change Email
+  const handleChangeEmail = (val) => {
+    // Set Email Input
+    setEmailInp(val);
+    // Validate Email
+    validateEmail(val, setEmailError);
+  };
+
+  // Handle Change Email
+  const handleChangePassword = (val) => {
+    // Set Password Input
+    setPasswordInp(val);
+    // Validate Password
+    validatePassword(val, setPasswordError);
+  };
+
+  // handleClickShowPassword
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  // handleMouseDownPassword
+  const handleMouseDownPassword = (event) => event.preventDefault();
+  
   // Sự kiện đăng nhập
-  const loginHandle = (e) => {
+  const handleLogin = (e) => {
+    // Prevented
     e.preventDefault();
-    Toasts.promise(
-      {
+
+    // Promising Login
+    Toasts.promise({
+      promiseState: {
         pending: 'Đang đăng nhập',
         success: 'Đăng nhập thành công 👌',
         error: 'Đăng nhập thất bại 🤯',
       },
-      async () => {
-        window.localStorage.setItem(
-          'user-data-obj',
-          JSON.stringify({
-            userEmail: 'daovietbao2002@gmail.com',
-            userPassword: '123456',
-          })
-        );
-        setTimeout(() => {
-          route.push('/views/scan');
-        }, 2000);
+      validate: async () => {
+        // Send login request and get response
+        const res = await fetcherPost('/auth/login', {
+          reqEmail: emailInp,
+          reqPassword: passwordInp,
+        }, () => route.push(path));
+
+        // Get Response Status and check success
+        const scResStatus = res.status === 200;
+
+        // Check Status Code
+        if (!scResStatus) {
+          // Toast Error
+          Toasts.error(res.data.detail);
+
+          // Set Email Error
+          setEmailError('Sai thông tin đăng nhập');
+
+          // Set Email Error
+          setPasswordError('Sai thông tin đăng nhập');
+        }
+
+        // Return validate boolean
+        return scResStatus ? res.data : false;
       },
-      async () => {
-        return emailInp === 'daovietbao2002@gmail.com' && passwordInp === '123456';
-      }
-    );
+      success: async (data) => {
+        // Exception
+        try {
+          // // Get Token
+          const { expiredTime, ...token } = data.token;
+
+          // Get User Data
+          const userData = data.userData;
+
+          // Save token to cookie
+          await setCookie('token', token, 300);
+
+          // Save user data to cookie
+          await setCookie('userData', userData, 300);
+
+          // Push Main layout
+          await route.push('/views/dashboard');
+
+        } catch (error) {
+          throw new Error(error);
+        }
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
   };
+
+  // Use Effect
+  useEffect(() => {
+    // Handle Check Is Login
+    const handleCheckLogin = async () => {
+      // Get Token
+      const token = getCookie('token');
+
+      // Check Token
+      token && await route.push('/views/dashboard');
+    }
+    // Call
+    handleCheckLogin();
+  }, [route]);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -73,7 +166,7 @@ export default function Login() {
           <Typography component="h1" variant="h5">
             Đăng nhập
           </Typography>
-          <Box component="form" onSubmit={loginHandle} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -81,28 +174,54 @@ export default function Login() {
               id="email"
               label="Địa chỉ Email"
               name="email"
-              focused
-              onChange={(e) => setEmailInp(e.target.value)}
+              onChange={(e) => handleChangeEmail(e.target.value)}
               autoComplete="email"
               autoFocus
+              value={emailInp}
+              error={Boolean(emailError)}
+              helperText={emailError}
             />
             <TextField
-              margin="normal"
               required
+              autoFocus
               fullWidth
-              name="password"
-              focused
-              label="Mật khẩu"
-              type="password"
-              onChange={(e) => setPasswordInp(e.target.value)}
+              margin="normal"
               id="password"
+              value={passwordInp}
+              type={showPassword ? 'text' : 'password'}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              label="Mật khẩu"
               autoComplete="current-password"
+              onChange={(e) => handleChangePassword(e.target.value)}
+              error={Boolean(passwordError)}
+              helperText={passwordError}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Lưu tài khoản"
             />
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+            <Button
+              disabled={
+                passwordInp === '' || emailInp === '' || emailError !== '' || passwordError !== ''
+              }
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
               Đăng nhập
             </Button>
             <Grid container>
@@ -112,8 +231,8 @@ export default function Login() {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2">
-                  {'Bạn chưa có tài khoản? Đăng nhập'}
+                <Link href="/auth/register" variant="body2">
+                  Chưa có tài khoản? Đăng ký!
                 </Link>
               </Grid>
             </Grid>

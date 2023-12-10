@@ -1,5 +1,3 @@
-'use client';
-import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -21,15 +19,18 @@ import Link from '@/components/customs/Link';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import DocumentScannerOutlinedIcon from '@mui/icons-material/DocumentScannerOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
-import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import Toasts from '@/utils/toasts';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { useRouter } from 'next/router';
-import Avatars from '@/components/avartars';
+import Avatars from '@/components/avatars';
 import { Stack } from '@mui/material';
+import { useState } from 'react';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import InsertChartOutlinedTwoToneIcon from '@mui/icons-material/InsertChartOutlinedTwoTone';
+import BasicSpeedDial from '@/components/ basic-speed-dial';
 
+// Drawer Width
 const drawerWidth = 240;
 
+// Open Mixin
 const openedMixin = (theme) => ({
   width: drawerWidth,
   transition: theme.transitions.create('width', {
@@ -39,6 +40,7 @@ const openedMixin = (theme) => ({
   overflowX: 'hidden',
 });
 
+// Close Mixin
 const closedMixin = (theme) => ({
   transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
@@ -51,6 +53,7 @@ const closedMixin = (theme) => ({
   },
 });
 
+// Drawer UI Header
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -92,66 +95,84 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
       ...closedMixin(theme),
       '& .MuiDrawer-paper': closedMixin(theme),
     }),
-  }),
+  })
 );
 
-export default function Main({ title = 'Nội dung', children }) {
+// Sidebar Data
+const sidebarData = [
+  {
+    text: 'Thống kê',
+    link: '/views/dashboard',
+    icon: <InsertChartOutlinedTwoToneIcon />,
+  },
+  {
+    text: 'Quét tài liệu',
+    link: '/views/scan',
+    icon: <DocumentScannerOutlinedIcon />,
+  },
+  {
+    text: 'Thư mục cá nhân',
+    link: '/views/folder-manager',
+    icon: <FolderOpenOutlinedIcon />,
+  },
+  {
+    text: 'Thư mục chia sẻ',
+    link: '/views/folder-shared',
+    icon: <FolderOpenOutlinedIcon />,
+  },
+  {
+    text: 'Báo cáo công việc',
+    link: '/views/report',
+    icon: <AssignmentOutlinedIcon />,
+  },
+];
+
+export default function Main({ title = 'Nội dung', children, backgroundColor = 'white'}) {
   const theme = useTheme();
+
   const route = useRouter();
-  
-  // Đăng xuát
-  const logoutHandle = (e) => {
-    e.preventDefault();
-    Toasts.promise({
-      pending: 'Đang đăng xuất',
-      success: 'Đăng xuất thành công 👌',
-      error: 'Đăng xuất thất bại 🤯',
-    }, async () => {
-      window.localStorage.removeItem('user-data-obj');
-      route.push('/auth/login');
-    }, async () => {
-      let userData = JSON.parse(window.localStorage.getItem('user-data-obj'));
-      return userData ? true : false;
-    });
-  }
-  const [open, setOpen] = React.useState(true);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+  const [open, setOpen] = useState(true);
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  // Enable Drawer
+  const handleDrawerOpen = () => setOpen(true)
+
+  // Disable Drawer
+  const handleDrawerClose = () => setOpen(false);
 
   return (
-    <Box sx={{ display: 'flex'}}>
+    <Box sx={{ display: 'flex', height: '100%', backgroundColor}}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
-        <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
-          <Stack direction="row" alignItems='center'>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                sx={{
-                  marginRight: 5,
-                  ...(open && { display: 'none' }),
-                }}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography variant="h6" noWrap component="div">
-                {title}
-              </Typography>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Stack direction="row" alignItems="center">
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{
+                marginRight: 5,
+                ...(open && { display: 'none' }),
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div">
+              {title}
+            </Typography>
           </Stack>
-          <Avatars/>  
+          <Avatars />
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
         <DrawerHeader>
-          <Typography variant="h6" noWrap component="div" sx={{width: '100%', marginLeft: '10px'}}>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ width: '100%', marginLeft: '10px' }}
+          >
             Scanner
           </Typography>
           <IconButton onClick={handleDrawerClose}>
@@ -160,105 +181,112 @@ export default function Main({ title = 'Nội dung', children }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {[
-            {
-              text: 'Quét tài liệu',
-              link: '/views/scan',
-              icon: <DocumentScannerOutlinedIcon/>
-            },
-            {
-              text: 'Quản lý thư mục',
-              link: '/views/folder-manager',
-              icon: <FolderOpenOutlinedIcon/>
-            },
-            {
-              text: 'Báo cáo công việc',
-              link: '/views/report',
-              icon: <AssignmentOutlinedIcon/>
-            }
-          ].map((item, index) => (
-            <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
-              <Link href={item.link} sx={{textDecoration: 'none', color: '#000'}}>
-                <ListItemButton
-                  sx={{
-                    minHeight: 48,
-                    justifyContent: open ? 'initial' : 'center',
-                    px: 2.5,
-                  }}
-                >
-                  <ListItemIcon
+          {sidebarData.map((item) => {
+            // Check route active
+            const isActive = route.pathname === item.link;
+
+            // Render
+            return (
+              <ListItem
+                key={item.text}
+                disablePadding
+                sx={{ display: 'block', position: 'relative' }}
+              >
+                <Link href={item.link} sx={{ textDecoration: 'none', color: '#000' }}>
+                  <ListItemButton
                     sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : 'auto',
-                      justifyContent: 'center',
+                      minHeight: 48,
+                      justifyContent: open ? 'initial' : 'center',
+                      px: 2.5,
+                      backgroundColor: isActive ? 'rgb(230, 247, 255)' : 'white',
                     }}
                   >
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-          ))}
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        mr: open ? 3 : 'auto',
+                        justifyContent: 'center',
+                        color: isActive ? '#1976d2' : '#000',
+                      }}
+                    >
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.text}
+                      sx={{
+                        opacity: open ? 1 : 0,
+                        color: isActive ? '#1976d2' : '#000',
+                      }}
+                    />
+                  </ListItemButton>
+                </Link>
+                {isActive && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      backgroundColor: 'rgb(24, 144, 255)',
+                      width: '2px',
+                      zIndex: 2,
+                    }}
+                  />
+                )}
+              </ListItem>
+            );
+          })}
         </List>
-        <Divider />
-        <List>
-          {[
-            {
-              text: 'Người dùng',
-              link: '/views/userprofile',
-              icon: <AccountCircleOutlinedIcon/>
-            }
-          ].map((item, index) => (
-            <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
+        <ListItem disablePadding sx={{ display: 'block' }}>
+          <Link href="/views/bin" sx={{ textDecoration: 'none', color: '#000' }}>
+            <ListItemButton
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? 'initial' : 'center',
+                px: 2.5,
+                backgroundColor:
+                  route.pathname === '/views/bin' ? 'rgb(230, 247, 255)' : 'white',
+              }}
+            >
+              <ListItemIcon
                 sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
+                  minWidth: 0,
+                  mr: open ? 3 : 'auto',
+                  justifyContent: 'center',
+                  color: route.pathname === '/views/bin' ? '#1976d2' : '#000',
                 }}
               >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-          <ListItem disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
-                onClick={logoutHandle}
+                <DeleteOutlineOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Thùng rác"
                 sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
+                  opacity: open ? 1 : 0,
+                  color: route.pathname === '/views/bin' ? '#1976d2' : '#000',
                 }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <LogoutOutlinedIcon/>
-                </ListItemIcon>
-                <ListItemText primary='Đăng xuất' sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-        </List>
+              />
+            </ListItemButton>
+          </Link>
+          {route.pathname === '/views/bin' && (
+            <Box
+              sx={{
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                bottom: 0,
+                backgroundColor: 'rgb(24, 144, 255)',
+                width: '2px',
+                zIndex: 2,
+              }}
+            />
+          )}
+        </ListItem>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, width: '100%', overflow: 'auto'}}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: '100%', height: 'max-content', overflow: 'auto' }}>
         <DrawerHeader />
         {children}
       </Box>
+      <BasicSpeedDial/>
     </Box>
-  )
+  );
 }
-

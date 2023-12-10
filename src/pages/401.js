@@ -2,12 +2,12 @@ import { Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
-export default function Page404() {
+export default function Page401() {
   // Router
   const router = useRouter();
 
   // Goback handle
-  const goBack = () => router.back ? router.back() : router.push('/views/dashboard');;
+  const goHome = () => router.push('/auth/login');
 
   // Render
   return (
@@ -20,10 +20,10 @@ export default function Page404() {
                 <h2 className='text-center'>404</h2>
               </div>
               <div className="contant_box_404">
-                <h2 className="h2">Trang này không tồn tại</h2>
-                <p>Đường dẫn bạn đã truy cập không tồn tại, vui lòng thử lại</p>
-                <Button variant='contained' onClick={goBack} sx={{mt: '30px'}}>
-                  Về trang trước
+                <h2 className="h2">Phiên đăng nhập hết hạn</h2>
+                <p>Bạn không có quyền truy cập tài nguyên này, hãy đăng nhập lại</p>
+                <Button variant='contained' onClick={goHome} sx={{mt: '30px'}}>
+                  Về trang đăng nhập
                 </Button>
               </div>
             </div>

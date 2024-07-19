@@ -28,7 +28,7 @@ export default function Register() {
   const route = useRouter();
   
   // Change Route
-  const changeRoute = (path) => route.push(path);
+  const routing = (path) => route.push(path);
 
   // Fullname Input
   const [fullnameInp, setFullnameInp] = useState('');

@@ -9,6 +9,8 @@
 html, body {
   height: 100%;
   overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: transparent;
 }
 
 #__next {
@@ -24,12 +26,12 @@ html, body {
 }
 
 /* Hidden scrollbar */
-.hidden-scrollbar::-webkit-scrollbar {
+body::-webkit-scrollbar, .hidden-scrollbar::-webkit-scrollbar {
   width: 0;
   background-color: transparent;
 }
 
-.hidden-scrollbar::-webkit-scrollbar-thumb {
+body::-webkit-scrollbar, .hidden-scrollbar::-webkit-scrollbar-thumb {
   background-color: transparent;
 }
 

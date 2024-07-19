@@ -3,61 +3,45 @@ import MenuItem from '@mui/material/MenuItem';
 import CustomDialog from '@/components/custom-dialog';
 import { ListItemText, TextField } from '@mui/material';
 import CustomTextArea from '@/components/custom-text-area';
-import React from 'react';
+import React, { memo } from 'react';
 import { fetcherPost } from '@/utils/fetcher';
 import { getCookie } from '@/utils/cookie';
 import Toasts from '@/utils/toasts';
-import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import LockPersonOutlinedIcon from '@mui/icons-material/LockPersonOutlined';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import ModeOutlinedIcon from '@mui/icons-material/ModeOutlined';
 import { useRouter } from 'next/navigation';
 import { ScanningContext } from '@/context/scanning-context';
+import { binarySearch } from '@/utils/search';
+import ViewDetail from './view-detail';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import Link from '../customs/Link';
 
-export default function TreeItemActions({
-  data = null,
-  actions,
-  nodeHandle,
-  parentAction,
-  parentData,
-  setAnchorEl,
-  anchorEl,
-}) {
+function FolderDetailActions({ data = null, setAnchorEl, anchorEl, setDatas, datas, setChange }) {
   // useRoute
   const route = useRouter();
 
   // Change Route
   const routing = (path) => route.push(path);
 
-  // Folder Context
-  const folderContext = React.useContext(ScanningContext).folders;
-
-  // Folder Changed Context
+  // Changed Context
   const folderChangedCtx = React.useContext(ScanningContext).folderChanged;
 
-  //   Handle Close Menu
+  // Handle Close Menu
   const handleClose = () => setAnchorEl(null);
-
-  //   Folder Desc string
-  const [addFDes, setAddFDes] = React.useState('');
-
-  //   Folder Name string
-  const [addFName, setAddFName] = React.useState('');
 
   // Is loading
   const [loading, setLoading] = React.useState(false);
 
-  //   Folder Desc string
+  // Folder Desc string
   const [editFDes, setEditFDes] = React.useState(data.desc);
 
-  //   Folder Name string
+  // Folder Name string
   const [editFName, setEditFName] = React.useState(data.name);
 
-  //   Handle Set Folder Add Desc
-  const handleSetAddDes = (val) => setAddFDes(val);
-
-  //   Handle Set Folder Add Desc
+  // Handle Set Folder Add Desc
   const handleSetEditDes = (val) => setEditFDes(val);
 
   //   Handle set loading
@@ -71,82 +55,6 @@ export default function TreeItemActions({
 
   // Is open
   const open = Boolean(anchorEl);
-
-  // Add Folder
-  const handleAddFolder = async () => {
-    // Enable loading
-    handleSetLoading(true);
-
-    // Close Model
-    handleClose();
-
-    // Check Empty
-    if (addFName !== '') {
-      // Promise
-      await Toasts.promise({
-        promiseState: {
-          pending: 'Đang thêm folder',
-          success: 'Thêm folder thành công 👌',
-          error: 'Thêm folder thất bại 🤯',
-        },
-        validate: async () => {
-          // Get User Id from cookie
-          const userId = getCookie('userData')?.userId;
-
-          // Send request add folder
-          const res = await fetcherPost(
-            '/folders/create',
-            {
-              userId,
-              parentId: data.id,
-              name: addFName,
-              desc: addFDes,
-              parentPath: data.path,
-            },
-            routing
-          );
-
-          // Get Response Status and check success
-          const scResStatus = res.status === 200;
-
-          // Return validate boolean
-          return scResStatus ? { rData: res.data, pData: data } : false;
-        },
-        success: async (data) => {
-          // Check Data Not False
-          if (data) {
-            // Child Folder Count
-            const childFoldersCount = data.pData.childFoldersCount + 1;
-
-            // Run Action
-            actions &&
-              (await actions((prev) => ({
-                ...prev,
-                childFoldersCount,
-                subs: prev?.subs ? [...prev.subs, data.rData] : [data.rData],
-              })));
-
-            // Temp
-            let temp = { ...data.pData, childFoldersCount };
-
-            // Call Node Handle
-            nodeHandle(temp);
-
-            // Disable Loading
-            handleSetLoading(false);
-
-            // Clear Input
-            setAddFDes('');
-
-            setAddFName('');
-          }
-        },
-      });
-    } else {
-      // Disable Loading
-      handleSetLoading(false);
-    }
-  };
 
   // Delete Folder
   const handleDelete = async () => {
@@ -169,7 +77,7 @@ export default function TreeItemActions({
           // Get User Id from cookie
           const userId = getCookie('userData')?.userId;
 
-          // Send request delete folder (POST)
+          // Send request delete folder
           const res = await fetcherPost(
             '/folders/soft-delete',
             {
@@ -188,28 +96,24 @@ export default function TreeItemActions({
           // Return validate boolean
           return scResStatus ? res.data : false;
         },
-        // Validator Successs
         success: async () => {
-          // Call actions if action not empty
-          actions && (await actions(null));
+          // New Data
+          let newData = datas;
 
-          // Check Valid Data
-          Boolean(data?.parentId) === false && folderContext.set(null);
+          // Run Action
+          folderChangedCtx.set({ id: data.id, isDeleted: true });
 
-          // Changed
-          folderChangedCtx.set({ id: data?.id, isDeleted: true });
+          // Find
+          const index = await binarySearch(datas, data.id);
 
-          // Check Parent Data
-          if (parentData) {
-            // Calculate Temp
-            let temp = { ...parentData, childFoldersCount: parentData.childFoldersCount - 1 };
+          // New Data
+          newData.splice(index, 1);
 
-            // Set Parent Action
-            parentAction(temp);
+          // Set new data
+          setDatas(newData);
 
-            // Call Node Handle
-            nodeHandle(temp);
-          }
+          // Change
+          setChange(true);
 
           // Disable Loading
           handleSetLoading(false);
@@ -233,7 +137,7 @@ export default function TreeItemActions({
     handleSetLoading(true);
 
     // Close handle dialog
-    setAnchorEl(false);
+    handleClose();
 
     // Check lock
     if (data.isLock == 0) {
@@ -268,24 +172,26 @@ export default function TreeItemActions({
             // Return validate boolean
             return scResStatus ? res.data : false;
           },
-          success: async (data) => {
+          success: async (dataRes) => {
             // Check Data Not False
-            if (data) {
+            if (dataRes) {
               // Run Action
-              actions &&
-                (await actions((prev) => {
-                  // New Data
-                  const newData = { ...prev, name: editFName, desc: editFDes };
+              folderChangedCtx.set({ ...data, name: editFName, desc: editFDes });
 
-                  // Changed
-                  folderChangedCtx.set(newData);
+              // Find
+              const index = await binarySearch(datas, data.id);
 
-                  // Call Node Handle
-                  nodeHandle(newData);
+              // New Data
+              let newData = datas;
 
-                  // Return
-                  return newData;
-                }));
+              // New Data
+              newData[index] = { ...data, name: editFName, desc: editFDes };
+
+              // Set new data
+              setDatas(newData);
+
+              // Change
+              setChange(true);
 
               // Disable Loading
               handleSetLoading(false);
@@ -321,7 +227,7 @@ export default function TreeItemActions({
     handleSetLoading(true);
 
     // Set Anchor
-    setAnchorEl(false);
+    handleClose();
 
     // Check
     if (isLock === data.isLock && isLock === 1) {
@@ -365,17 +271,23 @@ export default function TreeItemActions({
           return scResStatus ? res.data : false;
         },
         success: async () => {
-          // Check Data Not False
-          actions && (await actions((prev) => {
-            // New Data
-            const newData = { ...prev, isLock };
+          // Change lock
+          folderChangedCtx.set({ ...data, isLock });
 
-            // Change lock
-            folderChangedCtx.set(newData);
+          // Find
+          const index = await binarySearch(datas, data.id);
 
-            // Return
-            return newData;
-          }));
+          // New Data
+          let newData = datas;
+
+          // New Data
+          newData[index] = { ...data, isLock };
+
+          // Set new data
+          setDatas(newData);
+
+          // Change
+          setChange(true);
 
           // Disable Loading
           setLoading(false);
@@ -394,6 +306,10 @@ export default function TreeItemActions({
     }
   };
 
+  // View Detail
+  const viewDetail = async () => {};
+
+  // Return
   return (
     <Menu
       transformOrigin={{
@@ -406,39 +322,10 @@ export default function TreeItemActions({
       }}
       anchorEl={anchorEl}
       open={open}
+      disablePortal
       onClose={handleClose}
       onContextMenu={handleClose}
     >
-      {data?.type === 'folder' && (
-        <CustomDialog
-          smbtnText="Thêm"
-          button={
-            <MenuItem disabled={loading}>
-              <AddIcon fontSize="small" />
-              <ListItemText sx={{ marginLeft: '10px' }}>Thêm</ListItemText>
-            </MenuItem>
-          }
-          openValidate={{
-            status: data.isLock == 1 ? false : true,
-            error: 'Tệp tin này đã bị khoá, không thể thao tác.',
-          }}
-          title="Tạo thư mục mới"
-          handle={handleAddFolder}
-        >
-          <TextField
-            autoFocus
-            margin="normal"
-            id="folder-name-add"
-            label="Tên"
-            type="text"
-            required
-            fullWidth
-            onChange={(e) => setAddFName(e.target.value)}
-            value={addFName}
-          />
-          <CustomTextArea desc="Mô tả" value={addFDes} onChange={handleSetAddDes} />
-        </CustomDialog>
-      )}
       <MenuItem onClick={handleDelete} disabled={loading}>
         <DeleteOutlinedIcon fontSize="small" />
         <ListItemText sx={{ marginLeft: '10px' }}>Xoá</ListItemText>
@@ -478,6 +365,32 @@ export default function TreeItemActions({
         <LockOpenOutlinedIcon fontSize="small" />
         <ListItemText sx={{ marginLeft: '10px' }}>Mở khoá</ListItemText>
       </MenuItem>
+      <CustomDialog
+        button={
+          <MenuItem onClick={() => viewDetail()}>
+            <InfoOutlinedIcon fontSize="small" />
+            <ListItemText sx={{ marginLeft: '10px' }}>Chi tiết</ListItemText>
+          </MenuItem>
+        }
+        title={`Thông tin chi tiết ${data.type === 'folder' ? 'thư mục' : 'tài liệu'}`}
+      >
+        <ViewDetail data={data} />
+      </CustomDialog>
+      <Link
+        target="_blank"
+        href={`http://localhost:2820/folders/download-folder?folderPath=${data.path}&folderName=${data.name}`}
+        sx={{
+          textDecoration: 'none',
+          color: 'inherit',
+        }}
+      >
+        <MenuItem>
+          <FileDownloadOutlinedIcon fontSize="small" />
+          <ListItemText sx={{ marginLeft: '10px' }}>Tải xuống</ListItemText>
+        </MenuItem>
+      </Link>
     </Menu>
   );
 }
+
+export default memo(FolderDetailActions);

@@ -1,11 +1,19 @@
-import ScanningContext from "./context";
 import React from "react";
 import getStatistical from "@/handlers/getStatistical";
 import { getCookie } from "@/utils/cookie";
+import { createContext } from 'react';
+
+export const ScanningContext = createContext();
 
 export default function ScanningProvider({ children }) {
   // Statistical Data Context
   const [statisticalData, setStatisticalData] = React.useState(null);
+
+  // Folder
+  const [folder, setFolder] = React.useState(null);
+
+  // Folder Changed
+  const [folderChange, setFolderChange] = React.useState(null);
 
   // Use Effect
   React.useEffect(() => {
@@ -36,6 +44,14 @@ export default function ScanningProvider({ children }) {
   const sharedData = {
     statis: statisticalData,
     setStatisticalData: setStatisticalData,
+    folders: {
+      get: folder,
+      set: setFolder
+    },
+    folderChanged: {
+      get: folderChange,
+      set: setFolderChange
+    }
   }
 
   // Render

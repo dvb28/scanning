@@ -11,12 +11,12 @@ import { getCookie } from '@/utils/cookie';
 import { fetcherPost } from '@/utils/fetcher';
 import { useRouter } from 'next/navigation';
 
-export default function TreeItemCustom({ nodeHandle = null }) {
+export default function TreeItemCustom({ nodeHandle = null}) {
   // Route
   const route = useRouter();
 
   // Change Route
-  const changeRoute = (path) => route.push(path);
+  const routing = (path) => route.push(path);
 
   //   Folder Desc string
   const [addFDes, setAddFDes] = useState('');
@@ -52,7 +52,7 @@ export default function TreeItemCustom({ nodeHandle = null }) {
             name: addFName,
             desc: addFDes,
             parentPath: '/storage'
-          }, changeRoute);
+          }, routing);
 
           // Get Response Status and check success
           const scResStatus = res.status === 200;
@@ -79,10 +79,14 @@ export default function TreeItemCustom({ nodeHandle = null }) {
   // Handle Set Folders
   const getChildFolder = React.useCallback(async () => {
     // Get User Root Folder
-    const folders = await getChildFolders('root', changeRoute);
+    const folders = await getChildFolders('root', routing);
 
     // Set Data
     setTreeData(folders);
+
+    return () => {
+      console.log('Cleanup')
+    }
   }, []);
 
   // Use Effect
@@ -126,7 +130,7 @@ export default function TreeItemCustom({ nodeHandle = null }) {
       </Box>
       {treeData.length > 0 ? (
         <TransitionGroup>
-          <TreeItem nodeHandle={nodeHandle} treeData={treeData} />
+          <TreeItem nodeHandle={nodeHandle} treeData={treeData}/>
         </TransitionGroup>
       ) : (
         <Box sx={{ p: '10px', textAlign: 'center', fontSize: '14px' }}>Không có thư mục nào</Box>

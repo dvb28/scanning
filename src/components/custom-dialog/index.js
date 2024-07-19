@@ -25,12 +25,11 @@ export default function CustomDialog({
   // Open Dialog
   const handleOpenDialog = async () => {
     // Check validate open
-    if(openValidate === null) {
+    if (openValidate === null) {
       setOpen(true);
     } else {
       // Open dialog if success and show error toast if error
       openValidate.status ? setOpen(true) : Toasts.error(openValidate.error);
-
     }
   };
 
@@ -50,12 +49,11 @@ export default function CustomDialog({
     // Set time out
     setTimeout(async () => {
       // Handling
-      handle && await handle();
+      handle && (await handle());
 
       // Disable Loading
       setIsLoading(false);
     }, 300);
-    
   };
 
   return (

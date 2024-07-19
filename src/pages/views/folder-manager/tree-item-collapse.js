@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Button, CircularProgress, Collapse, Tooltip, Typography } from '@mui/material';
 import React from 'react';
 import TreeItemActions from './tree-item-actions';
@@ -7,6 +8,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import LockPersonOutlinedIcon from '@mui/icons-material/LockPersonOutlined';
 import Toasts from '@/utils/toasts';
 import { useRouter } from 'next/navigation';
+import { ScanningContext } from '@/context/scanning-context';
 
 const ArrowSquare = ({ collapse }) => {
   return (
@@ -35,11 +37,14 @@ export default function TreeItemCollapse({
   // Anchor
   const [anchorEl, setAnchorEl] = React.useState(null);
 
+  // Folder Context
+  const folderContext = React.useContext(ScanningContext).folders;
+
   // Route
   const route = useRouter();
 
   // Change Route
-  const changeRoute = React.useCallback((path) => route.push(path), [route]);
+  const routing = React.useCallback((path) => route.push(path), [route]);
 
   // Collapse State
   const [collapse, setCollapse] = React.useState(false);
@@ -57,12 +62,12 @@ export default function TreeItemCollapse({
   const refreshChildFolders = React.useCallback(
     async (folderId) => {
       // Get Child Folder
-      const folders = await getChildFolders(folderId, changeRoute);
+      const folders = await getChildFolders(folderId, routing);
 
       // Set Tree Data
       setTreeData((prev) => ({ ...prev, subs: folders }));
     },
-    [changeRoute, getChildFolders]
+    [routing, getChildFolders]
   );
 
   // Tree Item Click
@@ -83,6 +88,9 @@ export default function TreeItemCollapse({
           setFirstChange(true);
         }
 
+        // Call Node Handle
+        nodeHandle && folderChangedCtx.get?.id !== treeData?.id && nodeHandle(treeData);
+
         // Change Collapse
         changeCollapse();
 
@@ -93,16 +101,43 @@ export default function TreeItemCollapse({
       // Show Error
       Toasts.error('Thư mục này đã bị khoá bởi chủ sở hữu');
     }
-
-    // Call Node Handle
-    nodeHandle && nodeHandle(treeData);
   }, [firstChange, nodeHandle, refreshChildFolders, treeData]);
+
+  // Folder Changed Context
+  const folderChangedCtx = React.useContext(ScanningContext).folderChanged;
+
+  // Use Effect
+  React.useEffect(() => {
+    // Check
+    if (folderChangedCtx.get?.id === treeData?.id) {
+      // Check is delete
+      if (folderChangedCtx.get?.isDeleted) {
+        // Remove Folder
+        setTreeData(null);
+      } else {
+        // Calling
+        setTreeData(folderChangedCtx.get);
+      }
+      // Set Data
+      folderChangedCtx.set(null);
+    }
+  }, [folderChangedCtx.get]);
+
+  // Use Effect
+  React.useEffect(() => {
+    // Clean Up
+    return () => {
+      // Check
+      if(folderContext.get?.id === treeData?.id) {
+        // Clean
+        folderContext.set(null)
+      }
+    }
+  }, []);
 
   const handleRightClick = (e) => {
     // Set Anchor
     e.preventDefault();
-
-    console.log(e);
 
     // Set Anchor
     setAnchorEl(e.currentTarget);
@@ -116,7 +151,6 @@ export default function TreeItemCollapse({
           display: 'flex',
           alignItems: 'center',
         }}
-        id="this-tree-item"
         aria-controls={Boolean(anchorEl) ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={Boolean(anchorEl) ? 'true' : undefined}
@@ -134,6 +168,9 @@ export default function TreeItemCollapse({
               width: '100%',
               color: '#000',
               overflowX: 'hidden',
+              cursor: treeData.isLock === 0 ? 'pointer' : 'not-allowed',
+              backgroundColor:
+                folderContext?.get?.id === item?.id ? '#f0f9ff!important' : 'transparent',
             }}
             onClick={treeItemClick}
           >

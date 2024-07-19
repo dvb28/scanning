@@ -1,12 +1,11 @@
 import { Box, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-
+import React from 'react';
 export default function View() {
   // Route
   const route = useRouter();
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Route to home page
     const routing = async () => {
       setTimeout(async () => {

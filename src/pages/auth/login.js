@@ -20,6 +20,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { IconButton, InputAdornment } from '@mui/material';
 import { validateEmail, validatePassword } from '@/utils/validate';
 import { getCookie, setCookie } from '@/utils/cookie';
+import { isTokenExpired } from '@/utils/token';
 
 // Default Theme
 const defaultTheme = createTheme();
@@ -27,10 +28,6 @@ const defaultTheme = createTheme();
 export default function Login() {
   // useRoute
   const route = useRouter();
-  
-  // Change Route
-  const changeRoute = (path) => route.push(path);
-
 
   // Email Input
   const [emailInp, setEmailInp] = useState('admin@gmail.com');
@@ -141,8 +138,12 @@ export default function Login() {
       // Get Token
       const token = getCookie('token');
 
+      // Variable Is Not Permisson
+      const acIsExpired = token ? await isTokenExpired(token.accessToken) : true;
+
       // Check Token
-      token && await route.push('/views/dashboard');
+      !acIsExpired && await route.push('/views/dashboard');
+      
     }
     // Call
     handleCheckLogin();

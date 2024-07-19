@@ -4,7 +4,7 @@ import React from 'react';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import dynamic from 'next/dynamic';
-import ScanningContext from '@/context/context';
+import {ScanningContext} from '@/context/scanning-context';
 import getStatistical from '@/handlers/getStatistical';
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
